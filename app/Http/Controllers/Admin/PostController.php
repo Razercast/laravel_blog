@@ -7,6 +7,7 @@ use App\Post;
 use App\Tag;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Storage;
 
 class PostController extends Controller
 {
@@ -44,8 +45,19 @@ class PostController extends Controller
     {
         $request->validate([
             'title' => 'required',
+            'description' => 'required',
+            'content' => 'required',
+            'category_id' => 'required|integer',
+            'thumbnail' => 'nullable|image',
         ]);
-        dd($request->all());
+        $data = $request->all();
+
+        $data['thumbnail'] = Post::uploadImage($request);
+
+
+        $post = Post::create($data);
+        $post->tags()->sync($request->tags);
+
         return redirect()->route('posts.index')->with('success','Категория добавлена');
     }
 
@@ -69,8 +81,10 @@ class PostController extends Controller
      */
     public function edit($id)
     {
-        $category = Category::find($id);
-        return view('admin.posts.edit');
+        $post = Post::find($id);
+        $categories = Category::pluck('title','id')->all();
+        $tags = Tag::pluck('title','id')->all();
+        return view('admin.posts.edit',compact('post','categories','tags'));
     }
 
     /**
@@ -83,8 +97,19 @@ class PostController extends Controller
     public function update(Request $request, $id)
     {
         $request->validate([
-           "title" => "required",
+            'title' => 'required',
+            'description' => 'required',
+            'content' => 'required',
+            'category_id' => 'required|integer',
+            'thumbnail' => 'nullable|image',
         ]);
+
+        $post = Post::find($id);
+        $data = $request->all();
+        $data['thumbnail'] = Post::uploadImage($request,$post->thumbnail);
+
+        $post->update($data);
+        $post->tags()->sync($request->tags);
 
         return redirect()->route('posts.index')->with('success','Изменения сохранены');
     }
@@ -99,7 +124,7 @@ class PostController extends Controller
     {
 //        $category = Category::find($id);
 //        $category->delete();
-        //Category::destroy($id);
+        Post::destroy($id);
         return redirect()->route('posts.index')->with('success','Статья удалена');
     }
 }
