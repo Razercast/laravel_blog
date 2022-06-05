@@ -18,7 +18,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        $posts = Post::paginate(2);
+        $posts = Post::with('category','tags')->paginate(25);
         return view('admin.posts.index',compact('posts'));
     }
 
@@ -106,7 +106,10 @@ class PostController extends Controller
 
         $post = Post::find($id);
         $data = $request->all();
-        $data['thumbnail'] = Post::uploadImage($request,$post->thumbnail);
+        if($file = Post::uploadImage($request,$post->thumbnail)) {
+            $data['thumbnail'] = $file;
+        }
+
 
         $post->update($data);
         $post->tags()->sync($request->tags);
@@ -122,7 +125,7 @@ class PostController extends Controller
      */
     public function destroy($id)
     {
-//        $category = Category::find($id);
+          $category = Category::find($id);
 //        $category->delete();
         Post::destroy($id);
         return redirect()->route('posts.index')->with('success','Статья удалена');

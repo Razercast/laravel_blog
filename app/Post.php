@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Database\Eloquent\Model;
 use Cviebrock\EloquentSluggable\Sluggable;
@@ -50,6 +51,10 @@ class Post extends Model
             return asset('no_image.png');
         }
         return asset("uploads/{$this->thumbnail}");
+    }
+
+    public function  getPostDate() {
+        return Carbon::createFromFormat('Y-m-d H:i:s',$this->created_at)->format('d F, Y');
     }
 
 }

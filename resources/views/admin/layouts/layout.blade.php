@@ -6,6 +6,11 @@
     <title>AdminLTE 3 | Blank Page</title>
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,400i,700&display=fallback">
     <link rel="stylesheet" href="{{asset('assets/admin/css/admin.css')}}">
+    <style>
+        .ck-editor__editable_inline {
+            min-height: 300px;
+        }
+    </style>
 </head>
 <body class="hold-transition sidebar-mini">
 <!-- Site wrapper -->
@@ -273,6 +278,12 @@
                         </div>
                     @endif
 
+                    @if (session()->has('error'))
+                        <div class="alert alert-danger">
+                            {{session('error')}}
+                        </div>
+                    @endif
+
                     @if (session()->has('success'))
                         <div class="alert alert-success">
                             {{session('success')}}
@@ -303,6 +314,7 @@
 
 
 <script src="{{asset('assets/admin/js/admin.js')}}"></script>
+<script src="{{asset('js/bs-custom-file-input.min.js')}}"></script>
 <script>
     $('.nav-sidebar a').each(function(){
         let location = window.location.protocol + '//' + window.location.host + window.location.pathname;
@@ -313,5 +325,72 @@
         }
     });
 </script>
+<script>
+    $(function () {
+        bsCustomFileInput.init();
+    });
+</script>
+
+<script src="{{'/assets/admin/ckeditor/build/ckeditor.js'}}"></script>
+<script src="{{'/assets/admin/ckfinder/ckfinder.js'}}"></script>
+<script type="text/javascript">
+
+    ClassicEditor
+        .create( document.querySelector( '#content' ), {
+            ckfinder: {
+                uploadUrl: '/ckfinder/core/connector/php/connector.php?command=QuickUpload&type=Files&responseType=json'
+            },
+            toolbar: {
+                items: [
+                    'heading',
+                    '|',
+                    'bold',
+                    'italic',
+                    'link',
+                    'bulletedList',
+                    'numberedList',
+                    '|',
+                    'indent',
+                    'outdent',
+                    'alignment',
+                    '|',
+                    'blockQuote',
+                    'insertTable',
+                    'undo',
+                    'redo',
+                    'CKFinder',
+                    'mediaEmbed'
+                ]
+            },
+            language: 'ru',
+            image: {
+                toolbar: [
+                    'imageTextAlternative',
+                    'imageStyle:full',
+                    'imageStyle:side'
+                ]
+            },
+            table: {
+                contentToolbar: [
+                    'tableColumn',
+                    'tableRow',
+                    'mergeTableCells'
+                ]
+            },
+        } )
+        .catch( function( error ) {
+            console.error( error );
+        } );
+
+    ClassicEditor
+        .create( document.querySelector( '#description' ), {
+            toolbar: [ 'heading', '|', 'bold', 'italic', '|', 'undo', 'redo' ]
+        } )
+        .catch( function( error ) {
+            console.error( error );
+        } );
+
+</script>
+
 </body>
 </html>
